@@ -1,0 +1,2 @@
+data_logger:udp_client
+-DCATKIN_DEVEL_PREFIX=/home/hyridcar/car_ws/devel -DCMAKE_INSTALL_PREFIX=/home/hyridcar/car_ws/install -G Unix Makefiles
