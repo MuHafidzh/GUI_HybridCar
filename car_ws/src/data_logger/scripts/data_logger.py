@@ -1,61 +1,37 @@
 #!/usr/bin/env python
 
+import os
+import datetime
 import rospy
 from std_msgs.msg import String
-import os
-import signal
-import sys
-from datetime import datetime
-from pynput import keyboard
 
-log_data = []
+# Buat direktori ~/data_logs jika belum ada
+log_dir = os.path.expanduser('~/data_logs')
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
-def data_callback(msg):
-    rospy.loginfo("Received data: %s", msg.data)
-    log_data.append(msg.data)
+# Nama file log tetap
+log_file = os.path.join(log_dir, 'logger.txt')
 
-def save_data(filename_suffix):
-    directory = os.path.expanduser("~/data_logs")
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file_path = os.path.join(directory, f"data_log_{timestamp}_{filename_suffix}.txt")
-    with open(log_file_path, 'w') as f:
-        for line in log_data:
-            f.write(line + "\n")
-    rospy.loginfo("Data saved to %s", log_file_path)
+def callback(data):
+    # Dapatkan waktu saat ini
+    now = datetime.datetime.now()
+    day = now.strftime('%A')
+    date = now.strftime('%Y-%m-%d')
+    time = now.strftime('%H:%M:%S')
 
-def save_data_signal(signal, frame):
-    save_data("exit")
-    sys.exit(0)
+    # Format data yang akan disimpan
+    log_entry = f"{day}, {date}, {time}, {data.data}\n"
 
-def on_press(key):
-    try:
-        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
-            on_press.ctrl_pressed = True
-        elif key == keyboard.KeyCode.from_char('s') and on_press.ctrl_pressed:
-            save_data("runtime")
-    except AttributeError:
-        pass
+    # Simpan data ke file log
+    with open(log_file, 'a') as f:
+        f.write(log_entry)
 
-def on_release(key):
-    if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
-        on_press.ctrl_pressed = False
-
-on_press.ctrl_pressed = False
-
-def main():
+def listener():
     rospy.init_node('data_logger', anonymous=True)
-    rospy.Subscriber("udp_data", String, data_callback)
-
-    signal.signal(signal.SIGINT, save_data_signal)
-    signal.signal(signal.SIGTSTP, save_data_signal)
-
-    # Set up keyboard listener for "Ctrl+S"
-    listener = keyboard.Listener(on_press=on_press, on_release=on_release)
-    listener.start()
-
+    # rospy.Subscriber('udp_data', String, callback)
+    rospy.Subscriber('chatter', String, callback)
     rospy.spin()
 
 if __name__ == '__main__':
-    main()
+    listener()
