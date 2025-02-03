@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.treatment-hd {
+  @apply flex flex-col items-center font-sans;
+}
+
+.header {
+  @apply flex justify-between w-full p-2 bg-green-700 text-white;
+}
+
+.patient-card {
+  @apply bg-yellow-400 p-1;
+}
+
+.data-section {
+  @apply flex justify-between w-full p-2;
+}
+
+.data-item {
+  @apply flex flex-col items-center;
+}
+
+.uf-data {
+  @apply flex flex-col;
+}
+
+.timer {
+  @apply flex flex-col items-center p-2;
+}
+
+.dial {
+  @apply flex flex-col items-center text-2xl text-green-700;
+}
+
+.right-controls {
+  @apply flex flex-col items-end;
+}
+
+.control-group {
+  @apply flex flex-col items-end;
+}
+
+.control-group .btn {
+  @apply my-1 text-right;
+}
+
+.bf-rate {
+  @apply mt-5;
+}
